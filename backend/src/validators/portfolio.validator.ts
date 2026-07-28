@@ -22,7 +22,7 @@ export const updateProfileSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   title: z.string().min(1, 'Professional title is required'),
   bio: z.string().nullable().optional(),
-  avatarUrl: z.string().url('Invalid URL').or(z.string().regex(/^\/uploads\//)).nullable().optional(),
+  avatarUrl: z.string().nullable().optional(),
 });
 
 export const updateAboutSchema = z.object({

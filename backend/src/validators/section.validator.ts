@@ -11,7 +11,7 @@ export const skillSchema = z.object({
 export const projectSchema = z.object({
   title: z.string().min(1, 'Project title is required'),
   description: z.string().min(1, 'Project description is required'),
-  imageUrl: z.string().url('Invalid URL').or(z.string().regex(/^\/uploads\//)).nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   liveUrl: z.string().url('Invalid URL').or(z.literal('')).nullable().optional(),
   githubUrl: z.string().url('Invalid URL').or(z.literal('')).nullable().optional(),
   orderIndex: z.number().int().default(0),
@@ -41,7 +41,7 @@ export const certificateSchema = z.object({
   issuer: z.string().min(1, 'Issuer name is required'),
   date: z.string().transform((val) => new Date(val)).nullable().optional(),
   credentialUrl: z.string().url('Invalid URL').or(z.literal('')).nullable().optional(),
-  imageUrl: z.string().url('Invalid URL').or(z.string().regex(/^\/uploads\//)).nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   orderIndex: z.number().int().default(0),
 });
 
