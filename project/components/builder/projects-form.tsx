@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, GripVertical, Upload, ExternalLink, Github } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Upload, ExternalLink, Github, X } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import type { Project } from '@/lib/portfolio-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -68,10 +68,27 @@ export function ProjectsForm() {
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-4">
                   <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg border bg-muted">
-                    {p.image ? <img src={p.image} alt={p.title} className="h-full w-full object-cover" /> : (
+                    {p.image ? (
+                      <>
+                        <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
+                        <button onClick={() => updateProject(p.id, { image: '' })} className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : (
                       <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-1 text-xs text-muted-foreground hover:bg-muted/50">
                         <Upload className="h-4 w-4" /> Upload
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) updateProject(p.id, { image: URL.createObjectURL(f) }); }} />
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              updateProject(p.id, { image: reader.result as string });
+                              toast.success('Project image uploaded');
+                            };
+                            reader.readAsDataURL(f);
+                          }
+                        }} />
                       </label>
                     )}
                   </div>

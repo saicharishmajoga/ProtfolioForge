@@ -45,51 +45,72 @@ export function getUser(): any | null {
 
 export function setSession(accessToken: string, refreshToken: string, user: any) {
   if (typeof window === 'undefined') return;
-  // Write to both sessionStorage (active tab state) and localStorage (persistence)
-  sessionStorage.setItem('accessToken', accessToken);
-  sessionStorage.setItem('refreshToken', refreshToken);
-  sessionStorage.setItem('user', JSON.stringify(user));
+  try {
+    // Write to both sessionStorage (active tab state) and localStorage (persistence)
+    sessionStorage.setItem('accessToken', accessToken);
+    sessionStorage.setItem('refreshToken', refreshToken);
+    sessionStorage.setItem('user', JSON.stringify(user));
 
-  localStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
-  localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+  } catch (e) {
+    console.warn('Failed to save session to storage:', e);
+  }
 }
 
 export function clearSession() {
   if (typeof window === 'undefined') return;
-  sessionStorage.removeItem('accessToken');
-  sessionStorage.removeItem('refreshToken');
-  sessionStorage.removeItem('user');
+  try {
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('user');
 
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  } catch (e) {
+    console.warn('Failed to clear session from storage:', e);
+  }
 }
 
 // User-specific localStorage helpers to prevent cross-user data overwrite
 export function getUserStorageItem(key: string): string | null {
   if (typeof window === 'undefined') return null;
   const user = getUser();
-  if (!user || !user.id) return localStorage.getItem(key); // Fallback to raw key
-  return localStorage.getItem(`${key}_${user.id}`);
+  try {
+    if (!user || !user.id) return localStorage.getItem(key); // Fallback to raw key
+    return localStorage.getItem(`${key}_${user.id}`);
+  } catch (e) {
+    console.warn('Failed to read from localStorage:', e);
+    return null;
+  }
 }
 
 export function setUserStorageItem(key: string, value: string) {
   if (typeof window === 'undefined') return;
   const user = getUser();
-  if (!user || !user.id) {
-    localStorage.setItem(key, value);
-    return;
+  try {
+    if (!user || !user.id) {
+      localStorage.setItem(key, value);
+      return;
+    }
+    localStorage.setItem(`${key}_${user.id}`, value);
+  } catch (e) {
+    console.warn('Storage quota exceeded or writing failed:', e);
   }
-  localStorage.setItem(`${key}_${user.id}`, value);
 }
 
 export function removeUserStorageItem(key: string) {
   if (typeof window === 'undefined') return;
   const user = getUser();
-  if (!user || !user.id) {
-    localStorage.removeItem(key);
-    return;
+  try {
+    if (!user || !user.id) {
+      localStorage.removeItem(key);
+      return;
+    }
+    localStorage.removeItem(`${key}_${user.id}`);
+  } catch (e) {
+    console.warn('Failed to remove from localStorage:', e);
   }
-  localStorage.removeItem(`${key}_${user.id}`);
 }
